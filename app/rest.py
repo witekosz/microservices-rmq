@@ -7,6 +7,7 @@ async def handle_get_value(request):
     mock_value = {
         123: "test value"
     }
+    # TODO Implement get from queue
 
     key = request.match_info.get("key")
     data = mock_value.get(int(key))
@@ -18,7 +19,7 @@ async def handle_get_value(request):
 
 async def handle_post_value(request):
     key = request.match_info.get("key")
-    text = "Hello, " + key
+    # TODO Implement sending to queue
     return web.json_response(status=HTTPStatus.ACCEPTED)
 
 
