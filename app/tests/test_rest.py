@@ -1,7 +1,7 @@
 from http import HTTPStatus
 
-from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop
 from aiohttp import web
+from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop
 
 from app import rest
 
@@ -9,15 +9,17 @@ from app import rest
 class RESTTestCase(AioHTTPTestCase):
     async def get_application(self):
         app = web.Application()
-        app.add_routes([
-            web.get('/api/values/{key}/', rest.handle_get_value),
-            web.post('/api/values/{key}/', rest.handle_post_value)
-        ])
+        app.add_routes(
+            [
+                web.get("/api/values/{key}/", rest.handle_get_value),
+                web.post("/api/values/", rest.handle_post_value),
+            ]
+        )
         return app
 
     @unittest_run_loop
     async def test_get_value(self):
-        test_key = 123
+        test_key = "123"
         test_value = "test value"
 
         resp = await self.client.request("GET", f"/api/values/{test_key}/")
@@ -28,7 +30,7 @@ class RESTTestCase(AioHTTPTestCase):
 
     @unittest_run_loop
     async def test_get_key_not_found(self):
-        test_key = 321
+        test_key = "321"
 
         resp = await self.client.request("GET", f"/api/values/{test_key}/")
 
@@ -36,8 +38,19 @@ class RESTTestCase(AioHTTPTestCase):
 
     @unittest_run_loop
     async def test_handle_post(self):
-        test_key = 123
+        test_key = "123"
+        test_value = "test value"
+        data = {"key": test_key, "value": test_value}
 
-        resp = await self.client.request("POST", f"/api/values/{test_key}/")
+        resp = await self.client.request("POST", f"/api/values/", json=data)
 
         assert resp.status == HTTPStatus.ACCEPTED
+
+    @unittest_run_loop
+    async def test_handle_post_validation(self):
+
+        resp = await self.client.request("POST", f"/api/values/", json={})
+
+        assert resp.status == HTTPStatus.BAD_REQUEST
+        data = await resp.json()
+        assert {"message": "Validation error, pass valid: key"}
