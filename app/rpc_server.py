@@ -13,7 +13,7 @@ async def on_message(exchange: Exchange, message: IncomingMessage):
     with message.process():
         key = message.body.decode()
 
-        response = db.db_get_value(key).encode()
+        response = db.get_value(key).encode()
 
         await exchange.publish(
             Message(
@@ -27,7 +27,7 @@ async def on_message(exchange: Exchange, message: IncomingMessage):
 def on_message_send(message: IncomingMessage):
     data = message.body.decode()
     data = json.loads(data)
-    db.db_add_or_update_value(**data)    
+    db.add_or_update_value(**data)    
 
 
 async def main(loop):
