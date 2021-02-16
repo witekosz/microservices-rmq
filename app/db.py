@@ -15,4 +15,4 @@ def db_get_value(key: str, db=db) -> str:
     try:
         return values[0]["value"]
     except IndexError:
-        return None
+        return ""
