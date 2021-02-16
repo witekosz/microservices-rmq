@@ -16,10 +16,7 @@ async def on_message(exchange: Exchange, message: IncomingMessage):
         response = db.get_value(key).encode()
 
         await exchange.publish(
-            Message(
-                body=response,
-                correlation_id=message.correlation_id
-            ),
+            Message(body=response, correlation_id=message.correlation_id),
             routing_key=message.reply_to,
         )
 
@@ -27,7 +24,7 @@ async def on_message(exchange: Exchange, message: IncomingMessage):
 def on_message_send(message: IncomingMessage):
     data = message.body.decode()
     data = json.loads(data)
-    db.add_or_update_value(**data)    
+    db.add_or_update_value(**data)
 
 
 async def main(loop):
@@ -38,9 +35,7 @@ async def main(loop):
     queue_send = await channel.declare_queue("send_queue")
 
     await queue_send.consume(on_message_send, no_ack=True)
-    await queue.consume(partial(
-        on_message, channel.default_exchange)
-    )
+    await queue.consume(partial(on_message, channel.default_exchange))
 
 
 if __name__ == "__main__":
