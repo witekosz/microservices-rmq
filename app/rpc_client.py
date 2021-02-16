@@ -15,7 +15,7 @@ class RPCServiceClient:
         self.loop = loop
 
     async def connect(self):
-        self.connection = await connect(RABBIT_MQ_URL, loop=loop)
+        self.connection = await connect(RABBIT_MQ_URL, loop=self.loop)
         self.channel = await self.connection.channel()
         self.callback_queue = await self.channel.declare_queue(exclusive=True)
         await self.callback_queue.consume(self.on_response)
@@ -45,13 +45,13 @@ class RPCServiceClient:
         return await future
 
 
-async def main(loop):
+async def main(loop, key: str):
     rpc_client = await RPCServiceClient(loop).connect()
 
-    key = "123"
     print(f" [x] Requesting {key=}")
     response = await rpc_client.call(key)
     print(" [.] Got %r" % response)
+    return response
 
 
 if __name__ == "__main__":

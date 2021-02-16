@@ -1,14 +1,22 @@
+import asyncio
 from http import HTTPStatus
 
 from aiohttp import web
 
+from rpc_client import main
+from send import send_main
+
 
 async def handle_get_value(request):
-    mock_value = {123: "test value"}
-    # TODO Implement get from queue
-
     key = request.match_info.get("key")
-    data = mock_value.get(int(key))
+
+    loop = asyncio.get_event_loop()
+    tasks = [
+        asyncio.ensure_future(main(loop, key)),
+    ]
+    done, _ = await asyncio.wait(tasks)
+    data = done.pop().result()
+
     if data:
         return web.json_response(data)
     else:
@@ -26,7 +34,12 @@ async def handle_post_value(request):
             status=HTTPStatus.BAD_REQUEST,
         )
 
-    # TODO Implement sending to queue
+    loop = asyncio.get_event_loop()
+    tasks = [
+        asyncio.ensure_future(send_main(loop)),
+    ]
+    await asyncio.wait(tasks)
+
     return web.json_response(status=HTTPStatus.ACCEPTED)
 
 
