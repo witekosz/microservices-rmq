@@ -7,7 +7,7 @@ from aio_pika import connect, IncomingMessage, Exchange, Message
 
 from db import db
 
-RABBIT_MQ_URL = os.getenv("RABBIT_MQ_URL", default="amqp://guest:guest@rabbitmq/")
+RABBIT_MQ_URL = os.getenv("RABBIT_MQ_URL", default="amqp://guest:guest@localhost/")
 
 
 class RPCServiceServer:

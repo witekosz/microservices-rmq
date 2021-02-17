@@ -3,7 +3,7 @@ import asyncio
 from aio_pika import connect, Message
 
 
-RABBIT_MQ_URL = os.getenv("RABBIT_MQ_URL", default="amqp://guest:guest@rabbitmq/")
+RABBIT_MQ_URL = os.getenv("RABBIT_MQ_URL", default="amqp://guest:guest@localhost/")
 
 
 async def send_simplex_message(loop, key, value):
@@ -23,4 +23,4 @@ async def send_simplex_message(loop, key, value):
 
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(send_simplex_message(loop))
+    loop.run_until_complete(send_simplex_message(loop, key="321", value="test"))
