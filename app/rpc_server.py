@@ -48,4 +48,7 @@ if __name__ == "__main__":
 
     loop = asyncio.get_event_loop()
     loop.create_task(RPCServiceServer().connect(loop))
-    loop.run_forever()
+    try:
+        loop.run_forever()
+    finally:
+        loop.close()
