@@ -18,7 +18,7 @@ async def handle_get_value(request):
     data = done.pop().result()
 
     if data:
-        return web.json_response({"value": data.decode('utf-8')})
+        return web.json_response({"value": data.decode("utf-8")})
     else:
         return web.json_response(status=HTTPStatus.NOT_FOUND)
 

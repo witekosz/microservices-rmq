@@ -5,13 +5,13 @@ poetry run python -m unittest -v app/tests/test_rest.py
 ```
 
 ```
-curl -X POST http://0.0.0.0:8080/api/values/ -d '{"key": "123", "value": "test sdf"}'
+poetry export --output requirements.txt --without-hashes
 ```
 
 ```
-curl -X GET http://0.0.0.0:8080/api/values/128/
+curl -X POST -v http://0.0.0.0:8080/api/values/ -d '{"key": "123", "value": "test sdf"}'
 ```
 
-https://docs.aiohttp.org/en/stable/testing.html#aiohttp.test_utils.TestClient
-
-https://aio-pika.readthedocs.io/en/latest/
+```
+curl -X GET -v http://0.0.0.0:8080/api/values/123/
+```

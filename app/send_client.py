@@ -1,8 +1,9 @@
+import os
 import asyncio
 from aio_pika import connect, Message
 
 
-RABBIT_MQ_URL = "amqp://guest:guest@localhost/"
+RABBIT_MQ_URL = os.getenv("RABBIT_MQ_URL", default="amqp://guest:guest@rabbitmq/")
 
 
 async def send_simplex_message(loop, key, value):

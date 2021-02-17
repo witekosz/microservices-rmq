@@ -1,9 +1,11 @@
+import os
 import asyncio
 import uuid
 
 from aio_pika import connect, IncomingMessage, Message
 
-RABBIT_MQ_URL = "amqp://guest:guest@localhost/"
+
+RABBIT_MQ_URL = os.getenv("RABBIT_MQ_URL", default="amqp://guest:guest@rabbitmq/")
 
 
 class RPCServiceClient:
