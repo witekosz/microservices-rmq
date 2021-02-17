@@ -1,11 +1,13 @@
-import os
 import asyncio
+import logging
 import uuid
 
 from aio_pika import connect, IncomingMessage, Message
 
+import settings
 
-RABBIT_MQ_URL = os.getenv("RABBIT_MQ_URL", default="amqp://guest:guest@localhost/")
+
+logger = logging.getLogger(__name__)
 
 
 class RPCServiceClient:
@@ -17,7 +19,7 @@ class RPCServiceClient:
         self.loop = loop
 
     async def connect(self):
-        self.connection = await connect(RABBIT_MQ_URL, loop=self.loop)
+        self.connection = await connect(settings.RABBIT_MQ_URL, loop=self.loop)
         self.channel = await self.connection.channel()
         self.callback_queue = await self.channel.declare_queue(exclusive=True)
         await self.callback_queue.consume(self.on_response)
@@ -50,9 +52,9 @@ class RPCServiceClient:
 async def send_duplex_message(loop, key: str):
     rpc_client = await RPCServiceClient(loop).connect()
 
-    print(f" [x] Requesting {key}")
+    logger.info(f" [x] Requesting {key}")
     response = await rpc_client.call(key)
-    print(f" [.] Response {response}")
+    logger.info(f" [.] Response {response}")
     return response
 
 

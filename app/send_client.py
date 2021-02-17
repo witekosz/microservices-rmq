@@ -1,24 +1,27 @@
-import os
 import asyncio
+import logging
+
 from aio_pika import connect, Message
 
+import settings
 
-RABBIT_MQ_URL = os.getenv("RABBIT_MQ_URL", default="amqp://guest:guest@localhost/")
+
+logger = logging.getLogger(__name__)
 
 
 async def send_simplex_message(loop, key, value):
-    connection = await connect(RABBIT_MQ_URL, loop=loop)
-    channel = await connection.channel()
-    print(f" [x] Sending {key}, {value}")
+    connection = await connect(settings.RABBIT_MQ_URL, loop=loop)
 
-    await channel.default_exchange.publish(
-        Message(
-            f'{{"key": "{key}", "value": "{value}"}}'.encode(),
-            content_type="application/json",
-        ),
-        routing_key="send_queue",
-    )
-    await connection.close()
+    async with connection.channel() as channel:
+        logger.info(f" [x] Sending {key}, {value}")
+
+        await channel.default_exchange.publish(
+            Message(
+                f'{{"key": "{key}", "value": "{value}"}}'.encode(),
+                content_type="application/json",
+            ),
+            routing_key="send_queue",
+        )
 
 
 if __name__ == "__main__":

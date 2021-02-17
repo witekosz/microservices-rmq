@@ -1,18 +1,21 @@
 import os
+import logging
 import asyncio
 import json
 from functools import partial
 
 from aio_pika import connect, IncomingMessage, Exchange, Message
 
+import settings
 from db import db
 
-RABBIT_MQ_URL = os.getenv("RABBIT_MQ_URL", default="amqp://guest:guest@localhost/")
+
+logger = logging.getLogger(__name__)
 
 
 class RPCServiceServer:
     async def connect(self, loop):
-        connection = await connect(RABBIT_MQ_URL, loop=loop)
+        connection = await connect(settings.RABBIT_MQ_URL, loop=loop)
         channel = await connection.channel()
 
         queue_rpc = await channel.declare_queue("rpc_queue")
@@ -23,7 +26,7 @@ class RPCServiceServer:
 
     def on_message_send(self, message: IncomingMessage):
         data = message.body.decode()
-        print(f" [.] Recived message: {data}")
+        logger.info(f" [.] Recived message: {data}")
 
         data = json.loads(data)
         db.add_or_update_value(**data)
@@ -31,10 +34,10 @@ class RPCServiceServer:
     async def on_message_rpc(self, exchange: Exchange, message: IncomingMessage):
         with message.process():
             key = message.body.decode()
-            print(f" [.] Recived request: {key}")
+            logger.info(f" [.] Recived request: {key}")
 
             response = db.get_value(key).encode()
-            print(f" [.] Sending response: {response}")
+            logger.info(f" [.] Sending response: {response}")
 
             await exchange.publish(
                 Message(body=response, correlation_id=message.correlation_id),
@@ -43,8 +46,8 @@ class RPCServiceServer:
 
 
 if __name__ == "__main__":
-    print(" [x] Starting RPC service...")
-    print(" [x] Awaiting RPC requests")
+    logger.info(" [x] Starting RPC service...")
+    logger.info(" [x] Awaiting RPC requests")
 
     loop = asyncio.get_event_loop()
     loop.create_task(RPCServiceServer().connect(loop))
