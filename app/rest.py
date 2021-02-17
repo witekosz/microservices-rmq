@@ -34,11 +34,7 @@ async def handle_post_value(request):
             status=HTTPStatus.BAD_REQUEST,
         )
 
-    loop = asyncio.get_event_loop()
-    tasks = [
-        asyncio.ensure_future(send_simplex_message(loop, key=key, value=value)),
-    ]
-    await asyncio.wait(tasks)
+    await send_simplex_message(key=key, value=value)
 
     return web.json_response(status=HTTPStatus.ACCEPTED)
 

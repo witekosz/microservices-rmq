@@ -9,8 +9,8 @@ import settings
 logger = logging.getLogger(__name__)
 
 
-async def send_simplex_message(loop, key, value):
-    connection = await connect(settings.RABBIT_MQ_URL, loop=loop)
+async def send_simplex_message(key, value):
+    connection = await connect(settings.RABBIT_MQ_URL)
 
     async with connection.channel() as channel:
         logger.info(f" [x] Sending {key}, {value}")
@@ -26,4 +26,4 @@ async def send_simplex_message(loop, key, value):
 
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(send_simplex_message(loop, key="321", value="test"))
+    loop.run_until_complete(send_simplex_message(key="321", value="test"))
