@@ -4,42 +4,47 @@ from functools import partial
 
 from aio_pika import connect, IncomingMessage, Exchange, Message
 
-import db
+from db import db
 
 RABBIT_MQ_URL = "amqp://guest:guest@localhost/"
 
 
-async def on_message(exchange: Exchange, message: IncomingMessage):
-    with message.process():
-        key = message.body.decode()
+class RPCServiceServer:
+    async def connect(self, loop):
+        connection = await connect(RABBIT_MQ_URL, loop=loop)
+        channel = await connection.channel()
 
-        response = db.get_value(key).encode()
+        queue_rpc = await channel.declare_queue("rpc_queue")
+        queue_send = await channel.declare_queue("send_queue")
 
-        await exchange.publish(
-            Message(body=response, correlation_id=message.correlation_id),
-            routing_key=message.reply_to,
-        )
+        await queue_send.consume(self.on_message_send, no_ack=True)
+        await queue_rpc.consume(partial(self.on_message_rpc, channel.default_exchange))
 
+    def on_message_send(self, message: IncomingMessage):
+        data = message.body.decode()
+        print(f" [.] Recived message: {data}")
 
-def on_message_send(message: IncomingMessage):
-    data = message.body.decode()
-    data = json.loads(data)
-    db.add_or_update_value(**data)
+        data = json.loads(data)
+        db.add_or_update_value(**data)
 
+    async def on_message_rpc(self, exchange: Exchange, message: IncomingMessage):
+        with message.process():
+            key = message.body.decode()
+            print(f" [.] Recived request: {key}")
 
-async def main(loop):
-    connection = await connect(RABBIT_MQ_URL, loop=loop)
-    channel = await connection.channel()
+            response = db.get_value(key).encode()
+            print(f" [.] Sending response: {response}")
 
-    queue = await channel.declare_queue("rpc_queue")
-    queue_send = await channel.declare_queue("send_queue")
-
-    await queue_send.consume(on_message_send, no_ack=True)
-    await queue.consume(partial(on_message, channel.default_exchange))
+            await exchange.publish(
+                Message(body=response, correlation_id=message.correlation_id),
+                routing_key=message.reply_to,
+            )
 
 
 if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
+    print(" [x] Starting RPC service...")
+    print(" [x] Awaiting RPC requests")
 
-    loop.create_task(main(loop))
+    loop = asyncio.get_event_loop()
+    loop.create_task(RPCServiceServer().connect(loop))
     loop.run_forever()

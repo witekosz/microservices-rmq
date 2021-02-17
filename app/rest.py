@@ -3,8 +3,8 @@ from http import HTTPStatus
 
 from aiohttp import web
 
-from rpc_client import main
-from send import send_main
+from rpc_client import send_duplex_message
+from send_client import send_simplex_message
 
 
 async def handle_get_value(request):
@@ -12,7 +12,7 @@ async def handle_get_value(request):
 
     loop = asyncio.get_event_loop()
     tasks = [
-        asyncio.ensure_future(main(loop, key)),
+        asyncio.ensure_future(send_duplex_message(loop, key)),
     ]
     done, _ = await asyncio.wait(tasks)
     data = done.pop().result()
@@ -36,7 +36,7 @@ async def handle_post_value(request):
 
     loop = asyncio.get_event_loop()
     tasks = [
-        asyncio.ensure_future(send_main(loop)),
+        asyncio.ensure_future(send_simplex_message(loop, key=key, value=value)),
     ]
     await asyncio.wait(tasks)
 

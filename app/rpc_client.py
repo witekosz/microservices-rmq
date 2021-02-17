@@ -45,10 +45,10 @@ class RPCServiceClient:
         return await future
 
 
-async def main(loop, key: str):
+async def main(loop, key: str = "123"):
     rpc_client = await RPCServiceClient(loop).connect()
 
-    print(f" [x] Requesting {key=}")
+    print(f" [x] Requesting {key}")
     response = await rpc_client.call(key)
     print(" [.] Got %r" % response)
     return response

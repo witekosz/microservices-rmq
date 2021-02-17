@@ -5,12 +5,15 @@ from aio_pika import connect, Message
 RABBIT_MQ_URL = "amqp://guest:guest@localhost/"
 
 
-async def send_main(loop):
+async def send_main(loop, key, value):
     connection = await connect(RABBIT_MQ_URL, loop=loop)
     channel = await connection.channel()
 
     await channel.default_exchange.publish(
-        Message(b'{"key": "111", "value": "test value 1"}'),
+        Message(
+            '{"key": "{key}", "value": "{value}"}'.encode(),
+            content_type="application/json",
+        ),
         routing_key="send_queue",
     )
     await connection.close()
