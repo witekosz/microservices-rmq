@@ -11,15 +11,15 @@ logger = logging.getLogger(__name__)
 
 
 class RPCServiceClient:
-    def __init__(self, loop):
+    def __init__(self):
         self.connection = None
         self.channel = None
         self.callback_queue = None
         self.futures = {}
-        self.loop = loop
+        self.loop = asyncio.get_event_loop()
 
     async def connect(self):
-        self.connection = await connect(settings.RABBIT_MQ_URL, loop=self.loop)
+        self.connection = await connect(settings.RABBIT_MQ_URL)
         self.channel = await self.connection.channel()
         self.callback_queue = await self.channel.declare_queue(exclusive=True)
         await self.callback_queue.consume(self.on_response)
@@ -49,8 +49,8 @@ class RPCServiceClient:
         return await future
 
 
-async def send_duplex_message(loop, key: str):
-    rpc_client = await RPCServiceClient(loop).connect()
+async def send_duplex_message(key: str):
+    rpc_client = await RPCServiceClient().connect()
 
     logger.info(f" [x] Requesting {key}")
     response = await rpc_client.call(key)

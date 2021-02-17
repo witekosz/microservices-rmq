@@ -10,12 +10,7 @@ from send_client import send_simplex_message
 async def handle_get_value(request):
     key = request.match_info.get("key")
 
-    loop = asyncio.get_event_loop()
-    tasks = [
-        asyncio.ensure_future(send_duplex_message(loop, key)),
-    ]
-    done, _ = await asyncio.wait(tasks)
-    data = done.pop().result()
+    data = await send_duplex_message(key)
 
     if data:
         return web.json_response({"value": data.decode("utf-8")})
