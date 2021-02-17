@@ -45,15 +45,15 @@ class RPCServiceClient:
         return await future
 
 
-async def main(loop, key: str = "123"):
+async def send_duplex_message(loop, key: str):
     rpc_client = await RPCServiceClient(loop).connect()
 
     print(f" [x] Requesting {key}")
     response = await rpc_client.call(key)
-    print(" [.] Got %r" % response)
+    print(f" [.] Response {response}")
     return response
 
 
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(main(loop))
+    loop.run_until_complete(send_duplex_message(loop))
