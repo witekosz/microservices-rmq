@@ -12,7 +12,7 @@ async def send_simplex_message(loop, key, value):
 
     await channel.default_exchange.publish(
         Message(
-            '{"key": "{key}", "value": "{value}"}'.encode(),
+            f'{{"key": "{key}", "value": "{value}"}}'.encode(),
             content_type="application/json",
         ),
         routing_key="send_queue",
