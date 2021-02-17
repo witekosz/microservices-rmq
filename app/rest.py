@@ -3,7 +3,7 @@ from http import HTTPStatus
 
 from aiohttp import web
 
-from rpc_client import send_duplex_message, RPCServiceClient
+from rpc_client import RPCServiceClient
 from send_client import send_simplex_message
 
 
@@ -13,7 +13,7 @@ app = web.Application()
 async def handle_get_value(request):
     key = request.match_info.get("key")
 
-    data = await send_duplex_message(key)
+    data = await app['rpc_client'].send_duplex_message(key)
 
     if data:
         return web.json_response({"value": data.decode("utf-8")})

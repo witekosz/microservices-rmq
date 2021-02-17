@@ -48,16 +48,9 @@ class RPCServiceClient:
 
         return await future
 
+    async def send_duplex_message(self, key: str):
+        logger.info(f" [x] Requesting {key}")
+        response = await self.call(key)
 
-async def send_duplex_message(key: str):
-    rpc_client = await RPCServiceClient().connect()
-
-    logger.info(f" [x] Requesting {key}")
-    response = await rpc_client.call(key)
-    logger.info(f" [.] Response {response}")
-    return response
-
-
-if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(send_duplex_message(loop))
+        logger.info(f" [.] Response {response}")
+        return response
