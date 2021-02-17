@@ -3,8 +3,11 @@ from http import HTTPStatus
 
 from aiohttp import web
 
-from rpc_client import send_duplex_message
+from rpc_client import send_duplex_message, RPCServiceClient
 from send_client import send_simplex_message
+
+
+app = web.Application()
 
 
 async def handle_get_value(request):
@@ -34,7 +37,15 @@ async def handle_post_value(request):
     return web.json_response(status=HTTPStatus.ACCEPTED)
 
 
-app = web.Application()
+async def start_rpc_client(app):
+    rpc_client = RPCServiceClient().connect()
+    app['rpc_client'] = await asyncio.create_task(rpc_client)
+
+
+async def end_rpc_client(app):
+    await app['rpc_client'].connection.close()
+
+
 app.add_routes(
     [
         web.get("/api/values/{key}/", handle_get_value),
@@ -42,6 +53,6 @@ app.add_routes(
     ]
 )
 
-
-if __name__ == "__main__":
-    web.run_app(app)
+app.on_startup.append(start_rpc_client)
+app.on_cleanup.append(end_rpc_client)
+web.run_app(app)
