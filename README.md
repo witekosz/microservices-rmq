@@ -15,3 +15,11 @@ curl -X POST -v http://0.0.0.0:8080/api/values/ -d '{"key": "123", "value": "tes
 ```
 curl -X GET -v http://0.0.0.0:8080/api/values/123/
 ```
+
+#### Coverage
+
+```sh
+poetry run coverage run --source=. -m pytest app/tests/
+poetry run coverage report
+poetry run coverage html
+```

@@ -34,7 +34,7 @@ async def handle_post_value(request):
             status=HTTPStatus.BAD_REQUEST,
         )
 
-    await request.app['rpc_client'].send_simplex_message(message)
+    await request.app['rpc_client'].send_simplex_message(str(message))
 
     return web.json_response(status=HTTPStatus.ACCEPTED)
 

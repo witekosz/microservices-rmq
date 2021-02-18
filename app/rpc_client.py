@@ -30,7 +30,9 @@ class RPCServiceClient:
         future = self.futures.pop(message.correlation_id)
         future.set_result(message.body)
 
-    async def call(self, key: str):
+    async def send_duplex_message(self, message: str):
+        logger.info(f" [x] Requesting {message}")
+
         correlation_id = str(uuid.uuid4())
         future = self.loop.create_future()
 
@@ -38,29 +40,24 @@ class RPCServiceClient:
 
         await self.channel.default_exchange.publish(
             Message(
-                key.encode(),
+                message.encode(),
                 content_type="application/json",
                 correlation_id=correlation_id,
                 reply_to=self.callback_queue.name,
             ),
             routing_key="rpc_queue",
         )
-
-        return await future
-
-    async def send_duplex_message(self, key: str):
-        logger.info(f" [x] Requesting {key}")
-        response = await self.call(key)
+        response = await future
 
         logger.info(f" [.] Response {response}")
         return response
 
-    async def send_simplex_message(self, key, value):
-        logger.info(f" [x] Sending {key}, {value}")
+    async def send_simplex_message(self, message: str):
+        logger.info(f" [x] Sending {message}")
 
         await self.channel.default_exchange.publish(
             Message(
-                f'{{"key": "{key}", "value": "{value}"}}'.encode(),
+                message.encode(),
                 content_type="application/json",
             ),
             routing_key="send_queue",
