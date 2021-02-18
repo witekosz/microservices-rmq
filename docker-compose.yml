@@ -5,7 +5,7 @@ services:
     build: .
     restart: always
     container_name: rest-client
-    command: python rest.py
+    command: python -m app.rest
     environment:
      - RABBIT_MQ_URL=amqp://guest:guest@rabbitmq/
     ports:
@@ -29,7 +29,7 @@ services:
     build: .
     restart: always
     container_name: rpc-server
-    command: python rpc_server.py
+    command: python -m app.rpc_server
     environment:
      - RABBIT_MQ_URL=amqp://guest:guest@rabbitmq/
     depends_on:
