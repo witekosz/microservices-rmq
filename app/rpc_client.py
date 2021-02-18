@@ -4,7 +4,7 @@ import uuid
 
 from aio_pika import connect, IncomingMessage, Message
 
-import settings
+from app import settings
 
 
 logger = logging.getLogger("rpc_client")

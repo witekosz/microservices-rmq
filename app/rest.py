@@ -3,7 +3,7 @@ from http import HTTPStatus
 
 from aiohttp import web
 
-from rpc_client import RPCServiceClient
+from app.rpc_client import RPCServiceClient
 
 
 app = web.Application()
@@ -12,7 +12,7 @@ app = web.Application()
 async def handle_get_value(request):
     key = request.match_info.get("key")
 
-    data = await app['rpc_client'].send_duplex_message(key)
+    data = await request.app['rpc_client'].send_duplex_message(key)
 
     if data:
         return web.json_response({"value": data.decode("utf-8")})
@@ -31,7 +31,7 @@ async def handle_post_value(request):
             status=HTTPStatus.BAD_REQUEST,
         )
 
-    await app['rpc_client'].send_simplex_message(key=key, value=value)
+    await request.app['rpc_client'].send_simplex_message(key=key, value=value)
 
     return web.json_response(status=HTTPStatus.ACCEPTED)
 
@@ -52,6 +52,7 @@ app.add_routes(
     ]
 )
 
-app.on_startup.append(start_rpc_client)
-app.on_cleanup.append(end_rpc_client)
-web.run_app(app)
+if __name__ == "__main__":
+    app.on_startup.append(start_rpc_client)
+    app.on_cleanup.append(end_rpc_client)
+    web.run_app(app)

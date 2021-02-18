@@ -6,8 +6,8 @@ from functools import partial
 
 from aio_pika import connect, IncomingMessage, Exchange, Message
 
-import settings
-from db import db
+from app import settings
+from app.db import db
 
 
 logger = logging.getLogger("rpc_server")
