@@ -10,6 +10,7 @@ tinydb = "^4.4.0"
 aiohttp = {extras = ["speedups"], version = "^3.7.3"}
 aio-pika = "^6.7.1"
 pytest-aiohttp = "^0.3.0"
+marshmallow = "^3.10.0"
 
 [tool.poetry.dev-dependencies]
 coverage = "^5.4"

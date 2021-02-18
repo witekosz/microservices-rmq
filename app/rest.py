@@ -2,11 +2,14 @@ import asyncio
 from http import HTTPStatus
 
 from aiohttp import web
+from marshmallow import Schema, fields, ValidationError
 
 from app.rpc_client import RPCServiceClient
 
 
-app = web.Application()
+class ValueSchema(Schema):
+    key = fields.Str(required=True)
+    value = fields.Str(required=True)
 
 
 async def handle_get_value(request):
@@ -15,23 +18,23 @@ async def handle_get_value(request):
     data = await request.app['rpc_client'].send_duplex_message(key)
 
     if data:
-        return web.json_response({"value": data.decode("utf-8")})
+        return web.json_response({"key": key, "value": data.decode("utf-8")})
     else:
         return web.json_response(status=HTTPStatus.NOT_FOUND)
 
 
 async def handle_post_value(request):
+    data = await request.json()
+
     try:
-        data = await request.json()
-        key = data["key"]
-        value = data["value"]
-    except KeyError as exp:
+        message = ValueSchema().load(data)
+    except ValidationError as exp:
         return web.json_response(
-            {"message": f"Validation error, pass valid: {exp}"},
+            exp.messages,
             status=HTTPStatus.BAD_REQUEST,
         )
 
-    await request.app['rpc_client'].send_simplex_message(key=key, value=value)
+    await request.app['rpc_client'].send_simplex_message(message)
 
     return web.json_response(status=HTTPStatus.ACCEPTED)
 
@@ -43,6 +46,9 @@ async def start_rpc_client(app):
 
 async def end_rpc_client(app):
     await app['rpc_client'].connection.close()
+
+
+app = web.Application()
 
 
 app.add_routes(

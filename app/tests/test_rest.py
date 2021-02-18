@@ -41,8 +41,8 @@ class RESTTestCase(AioHTTPTestCase):
         resp = await self.client.request("GET", f"/api/values/{test_key}/")
 
         assert resp.status == HTTPStatus.OK
-        data = await resp.json()
-        assert test_value == data["value"]
+        resp_message = await resp.json()
+        assert resp_message == {'key': test_key, 'value': test_value}
 
     @unittest_run_loop
     async def test_handle_post(self):
@@ -60,5 +60,5 @@ class RESTTestCase(AioHTTPTestCase):
         resp = await self.client.request("POST", f"/api/values/", json={})
 
         assert resp.status == HTTPStatus.BAD_REQUEST
-        data = await resp.json()
-        assert {"message": "Validation error, pass valid: key"}
+        resp_message = await resp.json()
+        assert resp_message == {'key': ['Missing data for required field.'], 'value': ['Missing data for required field.']}
