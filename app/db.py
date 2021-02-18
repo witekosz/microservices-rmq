@@ -7,7 +7,7 @@ class TDB:
 
     def add_or_update_value(self, key: str, value):
         if self.get_value(key):
-            self.db.update({"value": 10}, Query().key == key)
+            self.db.update({"value": value}, Query().key == key)
         else:
             self.db.insert({"key": key, "value": value})
 
