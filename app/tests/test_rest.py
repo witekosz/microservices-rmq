@@ -2,12 +2,18 @@ from http import HTTPStatus
 
 from aiohttp import web
 from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop
+from unittest.mock import MagicMock
 
 from app import rest
 
 
 class RESTTestCase(AioHTTPTestCase):
     async def get_application(self):
+        rpc_client = MagicMock()
+        rpc_client.connect = MagicMock(return_value=rpc_client)
+        rpc_client.send_simplex_message = MagicMock(return_value=None)
+        rpc_client.send_simplex_message = MagicMock(return_value="test value")
+
         app = web.Application()
         app.add_routes(
             [
