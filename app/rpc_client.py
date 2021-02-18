@@ -7,7 +7,7 @@ from aio_pika import connect, IncomingMessage, Message
 import settings
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("rpc_client")
 
 
 class RPCServiceClient:
@@ -54,3 +54,14 @@ class RPCServiceClient:
 
         logger.info(f" [.] Response {response}")
         return response
+
+    async def send_simplex_message(self, key, value):
+        logger.info(f" [x] Sending {key}, {value}")
+
+        await self.channel.default_exchange.publish(
+            Message(
+                f'{{"key": "{key}", "value": "{value}"}}'.encode(),
+                content_type="application/json",
+            ),
+            routing_key="send_queue",
+        )

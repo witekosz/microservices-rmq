@@ -10,7 +10,7 @@ import settings
 from db import db
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("rpc_server")
 
 
 class RPCServiceServer:

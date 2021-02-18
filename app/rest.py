@@ -4,7 +4,6 @@ from http import HTTPStatus
 from aiohttp import web
 
 from rpc_client import RPCServiceClient
-from send_client import send_simplex_message
 
 
 app = web.Application()
@@ -32,7 +31,7 @@ async def handle_post_value(request):
             status=HTTPStatus.BAD_REQUEST,
         )
 
-    await send_simplex_message(key=key, value=value)
+    await app['rpc_client'].send_simplex_message(key=key, value=value)
 
     return web.json_response(status=HTTPStatus.ACCEPTED)
 
