@@ -2,7 +2,7 @@ import asyncio
 import logging
 import uuid
 
-from aio_pika import connect, IncomingMessage, Message
+from aio_pika import IncomingMessage, Message, connect
 
 from app import settings
 

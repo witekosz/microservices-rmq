@@ -1,10 +1,10 @@
-import os
-import logging
 import asyncio
 import json
+import logging
+import os
 from functools import partial
 
-from aio_pika import connect, IncomingMessage, Exchange, Message
+from aio_pika import Exchange, IncomingMessage, Message, connect
 
 from app import settings
 from app.db import db

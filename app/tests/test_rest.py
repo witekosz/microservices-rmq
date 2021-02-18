@@ -1,9 +1,9 @@
 import asyncio
 from http import HTTPStatus
+from unittest.mock import AsyncMock, patch
 
 from aiohttp import web
-from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop, TestServer
-from unittest.mock import patch, AsyncMock
+from aiohttp.test_utils import AioHTTPTestCase, TestServer, unittest_run_loop
 
 from app import rest
 from app.rpc_client import RPCServiceClient
@@ -42,7 +42,7 @@ class RESTTestCase(AioHTTPTestCase):
 
         assert resp.status == HTTPStatus.OK
         resp_message = await resp.json()
-        assert resp_message == {'key': test_key, 'value': test_value}
+        assert resp_message == {"key": test_key, "value": test_value}
 
     @unittest_run_loop
     async def test_handle_post(self):
@@ -61,4 +61,7 @@ class RESTTestCase(AioHTTPTestCase):
 
         assert resp.status == HTTPStatus.BAD_REQUEST
         resp_message = await resp.json()
-        assert resp_message == {'key': ['Missing data for required field.'], 'value': ['Missing data for required field.']}
+        assert resp_message == {
+            "key": ["Missing data for required field."],
+            "value": ["Missing data for required field."],
+        }

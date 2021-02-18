@@ -1,7 +1,7 @@
 import os
 from unittest import TestCase
 
-from tinydb import TinyDB, Query
+from tinydb import Query, TinyDB
 
 from app.db import TDB
 
