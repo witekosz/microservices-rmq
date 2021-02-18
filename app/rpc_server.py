@@ -25,11 +25,10 @@ class RPCServiceServer:
         await queue_rpc.consume(partial(self.on_message_rpc, channel.default_exchange))
 
     def on_message_send(self, message: IncomingMessage):
-        data = message.body.decode()
-        logger.info(f" [.] Recived message: {data}")
+        data_decoded = json.loads(message.body.decode())
+        logger.info(f" [.] Recived message: {data_decoded}")
 
-        data = json.loads(data)
-        db.add_or_update_value(**data)
+        db.add_or_update_value(**data_decoded)
 
     async def on_message_rpc(self, exchange: Exchange, message: IncomingMessage):
         with message.process():

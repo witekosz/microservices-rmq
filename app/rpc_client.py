@@ -1,4 +1,5 @@
 import asyncio
+import json
 import logging
 import uuid
 
@@ -54,10 +55,12 @@ class RPCServiceClient:
 
     async def send_simplex_message(self, message: str):
         logger.info(f" [x] Sending {message}")
+        
+        message_encoded = json.dumps(message).encode()
 
         await self.channel.default_exchange.publish(
             Message(
-                message.encode(),
+                message_encoded,
                 content_type="application/json",
             ),
             routing_key="send_queue",
