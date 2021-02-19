@@ -35,7 +35,7 @@ class RPCServiceServer:
             key = message.body.decode()
             logger.info(f" [.] Recived request: {key}")
 
-            response = db.get_value(key).encode()
+            response = str(db.get_value(key)).encode()
             logger.info(f" [.] Sending response: {response}")
 
             await exchange.publish(
